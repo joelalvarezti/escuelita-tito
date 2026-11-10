@@ -1,0 +1,1066 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#f7931e">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<title>Escuelita de Tito</title>
+<style>
+:root{
+  --ink:#3b2a1a; --orange:#f7931e; --cream:#fff7ec;
+  --p:clamp(84px,17vmin,150px);   /* tamaño de las piezas */
+  --t:clamp(150px,36vmin,340px);  /* tamaño del objetivo */
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#bfe9ff;color:var(--ink);
+  font-family:'Baloo 2',ui-rounded,'Nunito','Segoe UI',system-ui,sans-serif;
+  -webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+input,select{font:inherit;-webkit-user-select:text;user-select:text}
+
+/* ---------- Escenario ---------- */
+.bg{position:fixed;inset:0;background:linear-gradient(#8fd6ff,#e6f7ff 65%);overflow:hidden;z-index:0}
+.sun{position:absolute;top:5vh;right:7vw;width:13vmin;height:13vmin;border-radius:50%;background:#ffe066;box-shadow:0 0 0 2.2vmin #fff3b088}
+.cloud{position:absolute;width:22vmin;height:7vmin;background:#fff;border-radius:99px;opacity:.9;animation:drift 60s linear infinite}
+.cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
+.cloud::before{width:9vmin;height:9vmin;left:3vmin;top:-4.5vmin}
+.cloud::after{width:7vmin;height:7vmin;left:10vmin;top:-3vmin}
+@keyframes drift{from{transform:translateX(-30vmin)}to{transform:translateX(120vw)}}
+.hills{position:absolute;left:0;bottom:0;width:100%;height:34vh}
+
+/* ---------- Pantallas ---------- */
+.screen{position:fixed;inset:0;z-index:1;display:none;flex-direction:column;
+  padding:max(12px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.screen.active{display:flex;animation:fadein .35s ease-out}
+@keyframes fadein{from{transform:scale(.97)}to{transform:none}}
+.center{align-items:center;justify-content:center;text-align:center}
+
+.topbar{display:flex;align-items:center;gap:12px;min-height:64px}
+.topbar h2{margin:0;font-size:clamp(24px,4vmin,36px)}
+.round-btn{width:60px;height:60px;flex:none;border-radius:50%;background:#fff;font-size:30px;box-shadow:0 5px 0 #d9c7b3;display:grid;place-items:center}
+.round-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #d9c7b3}
+
+/* ---------- Mascota ---------- */
+.mascot svg{width:100%;height:100%;display:block;overflow:visible}
+.mascot .eyes{transform-box:fill-box;transform-origin:center;animation:blink 4.5s infinite}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+.mascot.happy{animation:jump .5s ease-out 2}
+@keyframes jump{0%,100%{transform:translateY(0)}40%{transform:translateY(-22%) rotate(-6deg)}70%{transform:translateY(0) scale(1.06,.94)}}
+.mascot.dance{animation:dance 1s ease-in-out infinite}
+@keyframes dance{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg) translateY(-8%)}}
+
+/* ---------- Inicio ---------- */
+.home-head{display:flex;align-items:center;gap:12px}
+.home-head .mascot{width:clamp(90px,17vmin,150px);height:clamp(100px,19vmin,170px);flex:none}
+.title-bubble{background:#fff;border-radius:24px;padding:8px 20px;position:relative;box-shadow:0 6px 0 #d9c7b3;flex:1;max-width:560px}
+.title-bubble h1{margin:0;font-size:clamp(24px,4.6vmin,44px);line-height:1.1;color:#e26d00}
+.title-bubble p{margin:0;font-size:clamp(16px,2.6vmin,24px)}
+.gear{margin-left:auto;align-self:flex-start;width:52px;height:52px;border-radius:50%;background:#ffffffaa;font-size:24px;position:relative;display:grid;place-items:center}
+.gear svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.gear circle{fill:none;stroke:#f7931e;stroke-width:5;stroke-dasharray:151;stroke-dashoffset:151}
+.gear.holding circle{transition:stroke-dashoffset 2s linear;stroke-dashoffset:0}
+.modules{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(12px,2.2vmin,24px);align-content:center;max-width:1100px;margin:0 auto;width:100%;padding:12px 0}
+.mod{background:#fff;border-radius:30px;border:5px solid var(--c);box-shadow:0 8px 0 var(--c),0 14px 22px #0002;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  min-height:clamp(120px,24vmin,220px);font-size:clamp(20px,3.4vmin,32px);font-weight:800;transition:transform .1s}
+.mod:active{transform:translateY(6px);box-shadow:0 2px 0 var(--c)}
+.mi{font-size:clamp(50px,10vmin,96px);line-height:1}
+.abc b{font-weight:800}
+
+/* ---------- Niveles ---------- */
+.levels{flex:1;display:flex;flex-wrap:wrap;gap:clamp(14px,3vmin,32px);align-items:center;justify-content:center}
+.lvl{background:#fff;border-radius:30px;border:6px solid var(--c);box-shadow:0 8px 0 var(--c);width:clamp(160px,26vmin,260px);aspect-ratio:1/1.05;
+  display:flex;flex-direction:column;align-items:center;justify-content:center}
+.lvl:active{transform:translateY(6px);box-shadow:0 2px 0 var(--c)}
+.lvl .stars{font-size:clamp(30px,6vmin,56px);letter-spacing:-6px}
+.lvl-n{font-size:clamp(24px,4vmin,38px);font-weight:800;color:var(--c)}
+.lvl-sub{font-size:clamp(14px,2.2vmin,20px);opacity:.75}
+
+/* ---------- Juego ---------- */
+.dots{flex:1;display:flex;gap:10px;justify-content:center}
+.dot{width:26px;height:26px;border-radius:50%;background:#ffffffaa;border:3px solid #fff;transition:.3s}
+.dot.on{background:#ffcf33;border-color:#f7931e;transform:scale(1.15)}
+.mini-m{width:70px;height:78px;flex:none}
+.bubble{background:#fff;border-radius:18px;padding:6px 14px;font-size:clamp(15px,2.4vmin,22px);max-width:38vw;box-shadow:0 4px 0 #d9c7b3;min-height:36px;display:flex;align-items:center}
+.bubble:empty{visibility:hidden}
+.stage{flex:1;display:flex;flex-direction:column;min-height:0}
+.target-area{flex:1;display:flex;align-items:center;justify-content:center;gap:4vmin;min-height:0}
+.tray{display:flex;flex-wrap:wrap;gap:clamp(14px,3vmin,32px);justify-content:center;align-content:center;padding:10px 0 16px;min-height:calc(var(--p) + 30px)}
+@media (max-width:600px){
+  .modules{grid-template-columns:repeat(2,1fr)}
+  .bubble{display:none}
+  .dots{gap:6px} .dot{width:18px;height:18px}
+  .mini-m{width:54px;height:60px}
+  .round-btn{width:52px;height:52px;font-size:26px}
+}
+@media (orientation:landscape) and (max-height:500px){
+  .modules{grid-template-columns:repeat(6,1fr)}
+}
+@media (orientation:landscape){
+  .stage{flex-direction:row}
+  .tray{width:46%;flex:none}
+}
+
+.target{width:var(--t);height:var(--t);border-radius:40px;display:grid;place-items:center;position:relative;
+  background:#ffffff88;border:6px dashed #ffffffee;transition:background .3s,border-color .3s}
+.target.over{background:#fff;border-color:#f7931e;transform:scale(1.04)}
+.target .emo{font-size:calc(var(--t)*.72);line-height:1;transition:filter .4s}
+.target.sil .emo{filter:brightness(0) opacity(.28)}
+.target.sil.done .emo{filter:none;animation:pop .5s}
+.target.done{border-style:solid;border-color:#ffcf33;background:#fff}
+.target.letter .ltr{font-size:calc(var(--t)*.8);font-weight:800;line-height:1;color:transparent;-webkit-text-stroke:5px #a08b76;transition:.3s}
+.target.letter.done .ltr{color:#f7931e;-webkit-text-stroke:0;animation:pop .5s}
+.hintpic{position:absolute;right:-6%;bottom:-6%;font-size:calc(var(--t)*.32);background:#fff;border-radius:50%;width:calc(var(--t)*.42);height:calc(var(--t)*.42);display:grid;place-items:center;box-shadow:0 4px 10px #0002}
+.target.bucket{background:none;border:0}
+.target.bucket svg{width:100%;height:100%}
+.target.bucket.done svg{animation:pop .5s}
+@keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+
+.piece{width:var(--p);height:var(--p);border-radius:28px;background:#fff;box-shadow:0 6px 0 #d9c7b3,0 10px 16px #0002;
+  display:grid;place-items:center;touch-action:none;position:relative;z-index:2;will-change:transform}
+.piece.dragging{z-index:50;box-shadow:0 16px 26px #0004}
+.piece .e{font-size:calc(var(--p)*.7);line-height:1;pointer-events:none}
+.piece.color-piece{background:none;box-shadow:none}
+.ball{width:88%;height:88%;border-radius:50%;background:radial-gradient(circle at 32% 30%,#fff9 0 14%,transparent 15%),var(--c);box-shadow:inset -8px -10px 0 #0002,0 8px 14px #0003;pointer-events:none}
+.piece.letter-piece{font-size:calc(var(--p)*.72);font-weight:800;color:#fff;background:var(--c);box-shadow:0 6px 0 #0003,0 10px 16px #0002;line-height:1}
+.wiggle{animation:wiggle .6s ease-in-out 3}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-12deg) scale(1.08)}75%{transform:rotate(12deg) scale(1.08)}}
+.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+.tapped{animation:pop .4s}
+#hand{position:fixed;left:0;top:0;font-size:64px;z-index:60;pointer-events:none;display:none;filter:drop-shadow(0 4px 4px #0003)}
+
+/* ---------- ¡Tu turno! ---------- */
+.overlay{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;background:#fff8eecc;backdrop-filter:blur(3px)}
+.overlay.show{display:flex;animation:fadein .3s}
+.echo-card{display:flex;flex-direction:column;align-items:center;gap:1vmin;text-align:center;padding:16px}
+.echo-visual{font-size:clamp(90px,24vmin,200px);line-height:1;height:clamp(100px,26vmin,220px);display:grid;place-items:center}
+.echo-visual .ball{width:clamp(90px,22vmin,190px);height:clamp(90px,22vmin,190px)}
+.echo-word{font-size:clamp(40px,10vmin,96px);font-weight:800;color:#e26d00;letter-spacing:2px;line-height:1.05}
+.echo-word .f{color:#1e6fd9}
+.mic-wrap{position:relative;width:clamp(90px,16vmin,140px);height:clamp(90px,16vmin,140px);display:grid;place-items:center;margin:1vmin}
+.mic-ring{position:absolute;inset:0;border-radius:50%;background:#ffcf33;transform:scale(calc(.7 + var(--lvl,0)*.6));transition:transform .08s;opacity:.85}
+.listening .mic-ring{animation:breathe 1.4s ease-in-out infinite}
+@keyframes breathe{50%{box-shadow:0 0 0 14px #ffcf3355}}
+.heard .mic-ring{background:#6cc04a;transform:scale(1.3)}
+.mic-ico{position:relative;font-size:clamp(44px,8vmin,70px)}
+.echo-btns{display:flex;gap:16px;margin-top:1vmin}
+.pbtn{background:#fff;border-radius:16px;padding:8px 16px;font-size:18px;font-weight:700;box-shadow:0 4px 0 #d9c7b3}
+.pbtn:active{transform:translateY(3px);box-shadow:0 1px 0 #d9c7b3}
+.pbtn.yes{background:#e6f7dd}
+.pbtn[disabled]{opacity:.35}
+.pbtn.rec-on{background:#ffd6d6;animation:breathe 1s infinite}
+
+/* ---------- Premio ---------- */
+#reward .mascot{width:clamp(160px,34vmin,300px);height:clamp(180px,38vmin,340px)}
+#reward h2{font-size:clamp(34px,7vmin,64px);margin:8px 0;color:#e26d00}
+.reward-stars{font-size:clamp(40px,8vmin,70px);display:flex;gap:6px}
+.reward-stars span{animation:pop .5s both}
+.row{display:flex;gap:24px;margin-top:3vmin}
+.big-btn{width:clamp(80px,14vmin,120px);height:clamp(80px,14vmin,120px);border-radius:50%;background:#fff;font-size:clamp(40px,7vmin,60px);box-shadow:0 7px 0 #d9c7b3}
+.big-btn:active{transform:translateY(5px);box-shadow:0 2px 0 #d9c7b3}
+.conf{position:fixed;top:-60px;z-index:90;pointer-events:none;font-size:34px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(115vh) rotate(540deg)}}
+
+/* ---------- Hablemos ---------- */
+.strip{flex:1;min-height:64px;background:#fff;border-radius:20px;display:flex;align-items:center;gap:8px;padding:4px 10px;overflow:hidden;box-shadow:inset 0 3px 0 #0001}
+.strip .chip{display:flex;flex-direction:column;align-items:center;font-size:14px;font-weight:700;line-height:1}
+.strip .chip span{font-size:34px}
+.board{flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(96px,15vmin,150px),1fr));gap:clamp(10px,2vmin,18px);align-content:start;overflow:auto;padding:14px 2px;touch-action:pan-y}
+.card{background:#fff;border-radius:24px;border:4px solid var(--c);box-shadow:0 6px 0 var(--c);aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:clamp(17px,2.8vmin,24px);font-weight:800}
+.card span{font-size:clamp(44px,8vmin,72px);line-height:1.1}
+.card:active{transform:translateY(5px);box-shadow:0 1px 0 var(--c)}
+
+/* ---------- Padres ---------- */
+.pscroll{flex:1;overflow:auto;touch-action:pan-y;padding:8px 0 30px;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));align-content:start}
+.pcard{background:#fffffff2;border-radius:20px;padding:14px 18px;font-size:17px}
+.pcard h3{margin:0 0 8px;font-size:22px}
+.pcard label{display:block;margin:8px 0}
+.pcard label input:not([type=checkbox]),.pcard select{display:block;width:100%;margin-top:4px;padding:8px 10px;border-radius:12px;border:2px solid #e0d2c2;background:#fff}
+.pcard input[type=range]{padding:0;border:0}
+.pcard .chk{display:flex;gap:10px;align-items:flex-start}
+.pcard .chk input{width:24px;height:24px;flex:none;margin-top:2px}
+.meter{height:16px;border-radius:99px;background:#eee;overflow:hidden;margin-top:8px}
+.meter div{height:100%;width:0;background:#6cc04a;transition:width .06s}
+.rec-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f0e6da}
+.rec-row b{flex:1;font-size:19px}
+.rec-row .pbtn{padding:6px 12px}
+.ok-dot{color:#43a047;font-weight:800}
+table{width:100%;border-collapse:collapse;font-size:16px}
+td,th{padding:4px 6px;text-align:left;border-bottom:1px solid #f0e6da}
+.tips li{margin:6px 0}
+.small{font-size:14px;opacity:.75}
+
+/* ---------- Inicio (tocar para jugar) ---------- */
+#start{background:linear-gradient(#8fd6ffee,#e6f7ffee)}
+.start-btn{display:flex;flex-direction:column;align-items:center;gap:10px}
+.start-btn .mascot{width:clamp(180px,40vmin,320px);height:clamp(200px,44vmin,360px)}
+.start-btn > span{background:#f7931e;color:#fff;font-size:clamp(28px,6vmin,52px);font-weight:800;padding:8px 36px;border-radius:99px;box-shadow:0 7px 0 #b85f00;animation:breathe2 1.6s infinite}
+@keyframes breathe2{50%{transform:scale(1.06)}}
+</style>
+</head>
+<body>
+
+<div class="bg" aria-hidden="true">
+  <div class="sun"></div>
+  <div class="cloud" style="top:10vh;animation-delay:-10s"></div>
+  <div class="cloud" style="top:22vh;animation-delay:-38s;animation-duration:80s"></div>
+  <svg class="hills" viewBox="0 0 1200 340" preserveAspectRatio="none">
+    <path d="M0 170 Q200 60 420 150 T820 130 T1200 120 V340 H0Z" fill="#9edb7e"/>
+    <path d="M0 230 Q260 150 520 220 T1000 200 T1200 210 V340 H0Z" fill="#7ccf6a"/>
+    <!-- casitas del barrio -->
+    <g transform="translate(150 150)"><rect width="70" height="55" fill="#ffd166"/><path d="M-8 0 L35 -35 L78 0Z" fill="#ef6f6c"/><rect x="26" y="25" width="18" height="30" fill="#8d5524"/></g>
+    <g transform="translate(960 125)"><rect width="80" height="60" fill="#a0c4ff"/><path d="M-8 0 L40 -38 L88 0Z" fill="#7a5cff"/><rect x="10" y="15" width="18" height="18" fill="#fff"/><rect x="50" y="15" width="18" height="18" fill="#fff"/></g>
+    <g transform="translate(560 120)"><rect width="110" height="80" fill="#fff2d9"/><path d="M-10 0 L55 -45 L120 0Z" fill="#f7931e"/><rect x="44" y="40" width="22" height="40" fill="#3d8bfd"/><circle cx="55" cy="-14" r="9" fill="#ffd54a"/></g>
+    <g fill="#4caf50"><circle cx="80" cy="190" r="34"/><circle cx="1110" cy="175" r="38"/><circle cx="760" cy="170" r="28"/></g>
+    <path d="M0 340 Q600 250 1200 340" fill="#5fb653"/>
+  </svg>
+</div>
+
+<!-- Inicio -->
+<section id="home" class="screen">
+  <header class="home-head">
+    <div class="mascot" data-mascot></div>
+    <div class="title-bubble"><h1 id="homeTitle">La Escuelita de Tito</h1><p id="homeHello">¡Hola! ¿Jugamos?</p></div>
+    <button class="gear" id="gear" aria-label="Área de padres (mantén presionado)">
+      <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24"/></svg>⚙️
+    </button>
+  </header>
+  <div class="modules">
+    <button class="mod" data-mod="letras" style="--c:#ff7a59"><span class="mi abc"><b style="color:#e53935">A</b><b style="color:#1e6fd9">B</b><b style="color:#43a047">C</b></span><span>Letras</span></button>
+    <button class="mod" data-mod="colores" style="--c:#b06ad9"><span class="mi">🎨</span><span>Colores</span></button>
+    <button class="mod" data-mod="animales" style="--c:#43a047"><span class="mi">🦁</span><span>Animales</span></button>
+    <button class="mod" data-mod="objetos" style="--c:#1e6fd9"><span class="mi">⚽</span><span>Objetos</span></button>
+    <button class="mod" data-mod="alimentos" style="--c:#e53935"><span class="mi">🍎</span><span>Alimentos</span></button>
+    <button class="mod" data-mod="hablemos" style="--c:#f7931e"><span class="mi">💬</span><span>Hablemos</span></button>
+  </div>
+</section>
+
+<!-- Niveles -->
+<section id="levels" class="screen">
+  <div class="topbar"><button class="round-btn" data-home aria-label="Inicio">🏠</button><h2 id="levelsTitle"></h2></div>
+  <div class="levels" id="levelBtns"></div>
+</section>
+
+<!-- Juego -->
+<section id="game" class="screen">
+  <div class="topbar">
+    <button class="round-btn" data-home aria-label="Inicio">🏠</button>
+    <div class="dots" id="dots"></div>
+    <div class="bubble" id="bubble"></div>
+    <div class="mascot mini-m" data-mascot id="gameMascot"></div>
+  </div>
+  <div class="stage"><div class="target-area" id="targetArea"></div><div class="tray" id="tray"></div></div>
+</section>
+
+<!-- Premio -->
+<section id="reward" class="screen center">
+  <div class="mascot dance" data-mascot></div>
+  <h2 id="rewardText">¡Lo lograste!</h2>
+  <div class="reward-stars" id="rewardStars"></div>
+  <div class="row"><button class="big-btn" id="again" aria-label="Otra vez">🔁</button><button class="big-btn" data-home aria-label="Inicio">🏠</button></div>
+</section>
+
+<!-- Hablemos -->
+<section id="talk" class="screen">
+  <div class="topbar">
+    <button class="round-btn" data-home aria-label="Inicio">🏠</button>
+    <div class="strip" id="strip"></div>
+    <button class="round-btn" id="stripPlay" aria-label="Decir">▶️</button>
+    <button class="round-btn" id="stripClear" aria-label="Borrar">✖️</button>
+  </div>
+  <div class="board" id="board"></div>
+</section>
+
+<!-- Padres -->
+<section id="parents" class="screen">
+  <div class="topbar"><button class="round-btn" data-home aria-label="Inicio">🏠</button><h2>Área de padres</h2></div>
+  <div class="pscroll" id="pscroll"></div>
+</section>
+
+<!-- ¡Tu turno! -->
+<div id="echo" class="overlay">
+  <div class="echo-card">
+    <div class="echo-visual" id="echoVisual"></div>
+    <div class="echo-word" id="echoWord"></div>
+    <div class="mic-wrap" id="micWrap"><div class="mic-ring"></div><div class="mic-ico">🎤</div></div>
+    <div class="echo-btns">
+      <button class="pbtn yes" id="echoYes">👍 Lo intentó</button>
+      <button class="pbtn" id="echoSkip">➡️ Seguir</button>
+    </div>
+  </div>
+</div>
+
+<div id="start" class="overlay show">
+  <button class="start-btn" id="startBtn"><div class="mascot" data-mascot></div><span>¡A jugar!</span></button>
+</div>
+<div id="hand">👆</div>
+
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const rnd = a => a[Math.floor(Math.random() * a.length)];
+const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const norm = s => String(s).trim().toLowerCase();
+
+/* ================= Datos ================= */
+const ANIMALS = [
+  { w: 'perro', a: 'el', e: '🐶', s: 'guau guau' },
+  { w: 'gato', a: 'el', e: '🐱', s: 'miau' },
+  { w: 'vaca', a: 'la', e: '🐮', s: 'muuu' },
+  { w: 'pato', a: 'el', e: '🦆', s: 'cuac cuac' },
+  { w: 'cerdito', a: 'el', e: '🐷', s: 'oinc oinc' },
+  { w: 'pollito', a: 'el', e: '🐥', s: 'pío pío' },
+  { w: 'oveja', a: 'la', e: '🐑', s: 'beee' },
+  { w: 'caballo', a: 'el', e: '🐴', s: 'iiii' },
+  { w: 'león', a: 'el', e: '🦁', s: 'grrr' },
+  { w: 'mono', a: 'el', e: '🐵', s: 'u u a a' },
+  { w: 'rana', a: 'la', e: '🐸', s: 'croac' },
+  { w: 'tigre', a: 'el', e: '🐯', s: 'grrr' },
+  { w: 'elefante', a: 'el', e: '🐘', s: 'tuuu' },
+  { w: 'abeja', a: 'la', e: '🐝', s: 'bzzz' },
+  { w: 'búho', a: 'el', e: '🦉', s: 'uh uh' },
+  { w: 'pez', a: 'el', e: '🐟', s: 'glu glu' },
+  { w: 'oso', a: 'el', e: '🐻', s: 'grrr' },
+  { w: 'conejo', a: 'el', e: '🐰', s: '' },
+];
+const OBJECTS = [
+  { w: 'pelota', a: 'la', e: '⚽' }, { w: 'carro', a: 'el', e: '🚗' }, { w: 'zapato', a: 'el', e: '👟' },
+  { w: 'casa', a: 'la', e: '🏠' }, { w: 'globo', a: 'el', e: '🎈' }, { w: 'osito', a: 'el', e: '🧸' },
+  { w: 'avión', a: 'el', e: '✈️' }, { w: 'libro', a: 'el', e: '📖' }, { w: 'cama', a: 'la', e: '🛏️' },
+  { w: 'silla', a: 'la', e: '🪑' }, { w: 'sol', a: 'el', e: '☀️' }, { w: 'mochila', a: 'la', e: '🎒' },
+  { w: 'tren', a: 'el', e: '🚂' }, { w: 'luna', a: 'la', e: '🌙' }, { w: 'flor', a: 'la', e: '🌸' },
+  { w: 'bicicleta', a: 'la', e: '🚲' }, { w: 'cepillo', a: 'el', e: '🪥' }, { w: 'llave', a: 'la', e: '🔑' },
+  { w: 'cuchara', a: 'la', e: '🥄' }, { w: 'gorra', a: 'la', e: '🧢' }, { w: 'lápiz', a: 'el', e: '✏️' },
+  { w: 'tambor', a: 'el', e: '🥁' }, { w: 'camión', a: 'el', e: '🚚' }, { w: 'reloj', a: 'el', e: '⏰' },
+];
+// Alimentos: primero los más básicos del día a día de un niño de 4 años
+const FOODS = [
+  { w: 'agua', a: 'el', e: '💧' }, { w: 'pan', a: 'el', e: '🍞' }, { w: 'leche', a: 'la', e: '🥛' },
+  { w: 'manzana', a: 'la', e: '🍎' }, { w: 'plátano', a: 'el', e: '🍌' }, { w: 'galleta', a: 'la', e: '🍪' },
+  { w: 'huevo', a: 'el', e: '🥚' }, { w: 'jugo', a: 'el', e: '🧃' }, { w: 'arroz', a: 'el', e: '🍚' },
+  { w: 'queso', a: 'el', e: '🧀' }, { w: 'pollo', a: 'el', e: '🍗' }, { w: 'uvas', a: 'las', e: '🍇' },
+  { w: 'sopa', a: 'la', e: '🍲' }, { w: 'naranja', a: 'la', e: '🍊' }, { w: 'fresa', a: 'la', e: '🍓' },
+  { w: 'zanahoria', a: 'la', e: '🥕' }, { w: 'papa', a: 'la', e: '🥔' }, { w: 'pera', a: 'la', e: '🍐' },
+  { w: 'sandía', a: 'la', e: '🍉' }, { w: 'cereal', a: 'el', e: '🥣' }, { w: 'tomate', a: 'el', e: '🍅' },
+  { w: 'pizza', a: 'la', e: '🍕' }, { w: 'helado', a: 'el', e: '🍦' }, { w: 'pastel', a: 'el', e: '🎂' },
+];
+const COLORS = [
+  { w: 'rojo', c: '#e53935' }, { w: 'azul', c: '#1e6fd9' }, { w: 'amarillo', c: '#fdd835' }, { w: 'verde', c: '#43a047' },
+  { w: 'naranja', c: '#fb8c00' }, { w: 'morado', c: '#8e24aa' }, { w: 'rosado', c: '#f06292' }, { w: 'café', c: '#8d5524' },
+];
+const LETTERS = [
+  { l: 'A', w: 'abeja', e: '🐝' }, { l: 'E', w: 'elefante', e: '🐘' }, { l: 'I', w: 'isla', e: '🏝️' },
+  { l: 'O', w: 'oso', e: '🐻' }, { l: 'U', w: 'uvas', e: '🍇' },
+  { l: 'M', w: 'manzana', e: '🍎' }, { l: 'P', w: 'pato', e: '🦆' }, { l: 'S', w: 'sol', e: '☀️' },
+  { l: 'L', w: 'luna', e: '🌙' }, { l: 'T', w: 'tigre', e: '🐯' },
+  { l: 'N', w: 'nube', e: '☁️' }, { l: 'B', w: 'barco', e: '⛵' }, { l: 'C', w: 'casa', e: '🏠' },
+  { l: 'G', w: 'gato', e: '🐱' }, { l: 'R', w: 'ratón', e: '🐭' }, { l: 'F', w: 'flor', e: '🌸' },
+  { l: 'D', w: 'dado', e: '🎲' }, { l: 'V', w: 'vaca', e: '🐮' },
+];
+const VOWELS = 'AEIOU';
+const TILE_COLORS = ['#e53935', '#1e6fd9', '#43a047', '#8e24aa', '#fb8c00', '#f06292'];
+const TALK = [
+  { w: 'quiero', e: '🤲', c: '#f7931e' }, { w: 'más', e: '➕', c: '#f7931e' }, { w: 'ya', e: '✋', c: '#f7931e' },
+  { w: 'sí', e: '👍', c: '#43a047' }, { w: 'no', e: '👎', c: '#e53935' }, { w: 'ayuda', e: '🙏', c: '#e53935' },
+  { w: 'mamá', e: '👩', c: '#1e6fd9' }, { w: 'papá', e: '👨', c: '#1e6fd9' }, { w: 'hola', e: '👋', c: '#1e6fd9' },
+  { w: 'agua', e: '💧', c: '#8e24aa' }, { w: 'comer', e: '🍽️', c: '#8e24aa' }, { w: 'galleta', e: '🍪', c: '#8e24aa' },
+  { w: 'jugar', e: '🧸', c: '#fb8c00' }, { w: 'pelota', e: '⚽', c: '#fb8c00' }, { w: 'abrazo', e: '🤗', c: '#fb8c00' },
+  { w: 'baño', e: '🚽', c: '#6d4c41' }, { w: 'dormir', e: '😴', c: '#6d4c41' }, { w: 'afuera', e: '🌳', c: '#6d4c41' },
+];
+const MODS = {
+  letras: { title: 'Letras', counts: [5, 10, 18], unit: 'letras' },
+  colores: { title: 'Colores', counts: [4, 6, 8], unit: 'colores' },
+  animales: { title: 'Animales', counts: [6, 12, 18], unit: 'animales' },
+  objetos: { title: 'Objetos', counts: [6, 14, 24], unit: 'objetos' },
+  alimentos: { title: 'Alimentos', counts: [6, 14, 24], unit: 'alimentos' },
+};
+const LEVELS = [
+  { n: 'Fácil', stars: '⭐', c: '#43a047', opts: 2 },
+  { n: 'Medio', stars: '⭐⭐', c: '#fb8c00', opts: 3 },
+  { n: 'Difícil', stars: '⭐⭐⭐', c: '#e53935', opts: 4 },
+];
+
+function itemsFor(mod, lvl) {
+  const count = MODS[mod].counts[lvl - 1];
+  if (mod === 'animales') return ANIMALS.slice(0, count).map(x => ({
+    key: x.w, type: 'emoji', show: x.e, name: x.w, label: `${x.a} ${x.w}`,
+    prompt: `¿Dónde está ${x.a} ${x.w}?`,
+    praise: x.s ? [x.w, `${cap(x.a)} ${x.w} hace`, x.s] : [x.w],
+    echo: (lvl === 1 && x.s) ? x.s : x.w,   // en Fácil se imita el sonido (más fácil que la palabra)
+  }));
+  if (mod === 'objetos') return OBJECTS.slice(0, count).map(x => ({
+    key: x.w, type: 'emoji', show: x.e, name: x.w, label: `${x.a} ${x.w}`,
+    prompt: `¿Dónde está ${x.a} ${x.w}?`, praise: [x.w], echo: x.w,
+  }));
+  if (mod === 'alimentos') return FOODS.slice(0, count).map(x => ({
+    key: x.w, type: 'emoji', show: x.e, name: x.w, label: `${x.a} ${x.w}`,
+    prompt: `¿Dónde ${x.a.endsWith('s') ? 'están' : 'está'} ${x.a} ${x.w}?`, praise: [x.w, '¡Ñam, ñam!'],
+    echo: lvl === 3 ? `quiero ${x.w}` : x.w,   // en Difícil practicamos la frase para pedir
+  }));
+  if (mod === 'colores') return COLORS.slice(0, count).map(x => ({
+    key: x.w, type: 'color', show: x.c, name: x.w, label: `el ${x.w}`,
+    prompt: `Busca el color ${x.w}`, praise: [x.w], echo: x.w,
+  }));
+  return LETTERS.slice(0, count).map(x => ({
+    key: x.l, type: 'letter', show: x.l, pic: x.e, name: x.l, label: `la letra ${x.l}`,
+    prompt: `Busca la letra ${x.l}`, praise: [x.l, `${x.l} de`, x.w],
+    echo: VOWELS.includes(x.l) ? x.l : x.w, echoPic: x.e,
+  }));
+}
+
+/* ================= Ajustes y progreso ================= */
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('tito.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('tito.' + k, JSON.stringify(v)); } catch (e) {} },
+};
+const settings = Object.assign({ child: '', mascot: 'Tito', echo: true, mic: true, rate: 0.9, pitch: 1.5, voice: '', sens: 0.03 }, store.get('settings', {}));
+const saveSettings = () => store.set('settings', settings);
+let stats = store.get('stats', {});
+function bump(word, f) { (stats[word] = stats[word] || { ok: 0, err: 0, voz: 0 })[f]++; store.set('stats', stats); }
+const childName = () => settings.child.trim();
+
+/* ================= Audio: efectos ================= */
+let AC = null;
+function audioCtx() { if (!AC) { const C = window.AudioContext || window.webkitAudioContext; if (C) AC = new C(); } return AC; }
+function tone(f, t0, dur, type = 'sine', vol = .18) {
+  const ac = audioCtx(); if (!ac) return;
+  const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime + t0;
+  o.type = type; o.frequency.value = f;
+  g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + .02); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  o.connect(g).connect(ac.destination); o.start(t); o.stop(t + dur + .05);
+}
+const sfx = {
+  ding() { tone(784, 0, .25); tone(1047, .12, .4); },
+  yay() { [523, 659, 784, 1047].forEach((f, i) => tone(f, i * .1, .35, 'triangle', .16)); },
+  soft() { tone(392, 0, .18, 'sine', .08); tone(330, .1, .22, 'sine', .07); },
+  pop() { tone(660, 0, .08, 'triangle', .1); },
+};
+document.addEventListener('pointerdown', () => { if (AC && AC.state === 'suspended') AC.resume(); }, true);
+
+/* ================= Voz (síntesis + grabaciones) ================= */
+let voices = [];
+function loadVoices() { if ('speechSynthesis' in window) voices = speechSynthesis.getVoices().filter(v => /^es/i.test(v.lang)); }
+if ('speechSynthesis' in window) { speechSynthesis.onvoiceschanged = loadVoices; loadVoices(); }
+// Voces femeninas conocidas (Windows, Chrome, Android). Con tono agudo suenan más infantiles y dulces.
+const FEMALE = /(female|mujer|sabina|helena|dalia|paloma|elvira|laura|hilda|paulina|m[oó]nica|lupe|pen[eé]lope|conchita|luc[ií]a|camila|valentina|elena|marisol|esperanza|salom[eé]|catalina|ximena|larissa|google espa)/i;
+const MALE = /(male|hombre|pablo|ra[uú]l|jorge|[aá]lvaro|gerardo|diego|enrique|carlos|juan|antonio|tom[aá]s|miguel|andr[eé]s|enrique|alonso)/i;
+const NATURAL = /(natural|neural|online|enhanced|premium|network|wavenet|studio|mejorad)/i;
+function voiceScore(v) {
+  let s = 0;
+  if (FEMALE.test(v.name)) s += 10;
+  if (MALE.test(v.name.replace(/female/i, ''))) s -= 10;
+  if (/es[-_](US|MX|419)/i.test(v.lang)) s += 3; else if (/es[-_]/i.test(v.lang)) s += 1;
+  if (NATURAL.test(v.name)) s += 20;   // voces neuronales: mucho más humanas
+  if (v.localService) s += 1;   // funciona sin internet
+  return s;
+}
+function sortedVoices() { return [...voices].sort((a, b) => voiceScore(b) - voiceScore(a)); }
+function pickVoice() {
+  if (settings.voice) { const v = voices.find(v => v.name === settings.voice); if (v) return v; }
+  return sortedVoices()[0];
+}
+let currentAudio = null;
+function stopSpeech() {
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
+  if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+}
+function bubble(text) { const b = $('#bubble'); if (b) b.textContent = text; }
+function speakOne(text, pitch, rate) {
+  return new Promise(res => {
+    const u = new SpeechSynthesisUtterance(text), v = pickVoice();
+    if (v) { u.voice = v; u.lang = v.lang; } else u.lang = 'es-MX';
+    u.rate = rate; u.pitch = Math.min(2, pitch);
+    let done = false; const fin = () => { if (!done) { done = true; res(); } };
+    u.onend = fin; u.onerror = fin;
+    setTimeout(fin, 2000 + text.length * 160 / rate);  // por si el navegador no avisa el final
+    speechSynthesis.speak(u);
+  });
+}
+/**
+ * Habla con entonación más viva: cada frase por separado, las exclamaciones
+ * más agudas y rápidas (alegría) y las preguntas con el tono un poco arriba.
+ * mood 'cheer' = felicitación, todo más efusivo.
+ */
+async function tts(text, mood) {
+  bubble(text);
+  if (!('speechSynthesis' in window)) return wait(600 + text.length * 60);
+  const sentences = text.match(/[¡¿]?[^.!?]+[.!?]*/g) || [text];
+  for (const raw of sentences) {
+    const t = raw.trim(); if (!t) continue;
+    let p = settings.pitch, r = settings.rate;
+    if (/!$/.test(t)) { p += 0.12; r *= 1.06; }
+    else if (/\?$/.test(t)) { p += 0.06; }
+    if (mood === 'cheer') { p += 0.15; r *= 1.05; }
+    await speakOne(t, p, Math.min(r, Math.max(settings.rate, 1.1)));  // efusiva pero clara
+  }
+}
+const REC = new Map();  // palabra -> grabación del padre/madre
+function playBlob(blob) {
+  return new Promise(res => {
+    const url = URL.createObjectURL(blob), a = new Audio(url);
+    currentAudio = a;
+    const fin = () => { URL.revokeObjectURL(url); if (currentAudio === a) currentAudio = null; res(); };
+    a.onended = fin; a.onerror = fin; a.onpause = fin;
+    a.play().catch(fin);
+  });
+}
+/** Dice una palabra: usa la grabación de la familia si existe; si no, la voz sintética. */
+function say(text, mood) {
+  const rec = REC.get(norm(text));
+  if (rec) { bubble(cap(text)); return playBlob(rec); }
+  const parts = norm(text).split(/\s+/);
+  if (parts.length > 1 && parts.every(p => REC.has(p))) {
+    bubble(cap(text));
+    return parts.reduce((pr, p) => pr.then(() => playBlob(REC.get(p))), Promise.resolve());
+  }
+  if (mood === 'cheer' && !/^¡/.test(text)) return tts('¡' + cap(text) + '!', 'cheer');
+  return tts(cap(text), mood);
+}
+// la primera palabra de una felicitación se dice con entusiasmo: "¡Perro!"
+async function sayAll(parts) { for (let i = 0; i < parts.length; i++) await say(parts[i], i === 0 ? 'cheer' : undefined); }
+
+/* ================= Base de datos de grabaciones ================= */
+const DB = {
+  db: null,
+  open() {
+    return new Promise(res => {
+      if (!('indexedDB' in window)) return res(null);
+      try {
+        const r = indexedDB.open('tito', 1);
+        r.onupgradeneeded = () => r.result.createObjectStore('rec');
+        r.onsuccess = () => { this.db = r.result; res(this.db); };
+        r.onerror = () => res(null);
+      } catch (e) { res(null); }
+    });
+  },
+  store(mode) { return this.db.transaction('rec', mode).objectStore('rec'); },
+  put(k, v) { return new Promise(res => { if (!this.db) return res(); const q = this.store('readwrite').put(v, k); q.onsuccess = q.onerror = () => res(); }); },
+  del(k) { return new Promise(res => { if (!this.db) return res(); const q = this.store('readwrite').delete(k); q.onsuccess = q.onerror = () => res(); }); },
+  all() {
+    return new Promise(res => {
+      const m = new Map(); if (!this.db) return res(m);
+      const c = this.store('readonly').openCursor();
+      c.onsuccess = () => { const cur = c.result; if (cur) { m.set(cur.key, cur.value); cur.continue(); } else res(m); };
+      c.onerror = () => res(m);
+    });
+  },
+};
+
+/* ================= Micrófono: detecta CUALQUIER vocalización ================= */
+const Mic = {
+  stream: null, an: null, buf: null, ok: false, cancel: null,
+  async init() {
+    if (this.ok) return true;
+    try {
+      this.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+      const ac = audioCtx(), src = ac.createMediaStreamSource(this.stream);
+      this.an = ac.createAnalyser(); this.an.fftSize = 1024; src.connect(this.an);
+      this.buf = new Float32Array(this.an.fftSize); this.ok = true;
+    } catch (e) { this.ok = false; }
+    return this.ok;
+  },
+  level() {
+    this.an.getFloatTimeDomainData(this.buf);
+    let s = 0; for (const v of this.buf) s += v * v;
+    return Math.sqrt(s / this.buf.length);
+  },
+  /** Escucha hasta `ms`. Resuelve true si oye voz sostenida (≈0.2 s) por encima del ruido ambiente. */
+  listen(ms, onLvl) {
+    return new Promise(res => {
+      if (!this.ok) return res(false);
+      const t0 = performance.now(); let last = t0, base = null, samples = [], hot = 0, raf = 0, done = false;
+      const fin = v => { if (done) return; done = true; cancelAnimationFrame(raf); this.cancel = null; res(v); };
+      this.cancel = () => fin(false);
+      const tick = () => {
+        const now = performance.now(), l = this.level(), dt = now - last; last = now;
+        if (now - t0 < 300) samples.push(l);
+        else {
+          if (base === null) base = samples.reduce((a, b) => a + b, 0) / Math.max(1, samples.length);
+          const thr = Math.max(base * 2.5, settings.sens);
+          hot = l > thr ? hot + dt : Math.max(0, hot - dt * .5);
+          if (hot >= 200) return fin(true);
+        }
+        onLvl && onLvl(Math.min(1, l / (settings.sens * 3)));
+        if (now - t0 > ms) return fin(false);
+        raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+    });
+  },
+};
+
+/* ================= Mascota (personaje original) ================= */
+function mascotSVG() {
+  return `<svg viewBox="0 0 200 230" aria-hidden="true">
+  <ellipse cx="100" cy="224" rx="62" ry="6" fill="#0002"/>
+  <path d="M46 218 Q48 160 100 154 Q152 160 154 218 Z" fill="#3d8bfd" stroke="#2a4f8f" stroke-width="4"/>
+  <path d="M100 170 l6 12 13 2 -9 9 2 13 -12 -6 -12 6 2 -13 -9 -9 13 -2z" fill="#ffd54a"/>
+  <circle cx="46" cy="50" r="24" fill="#f7931e" stroke="#6b3a1a" stroke-width="4"/><circle cx="46" cy="50" r="11" fill="#ffd3a8"/>
+  <circle cx="154" cy="50" r="24" fill="#f7931e" stroke="#6b3a1a" stroke-width="4"/><circle cx="154" cy="50" r="11" fill="#ffd3a8"/>
+  <ellipse cx="100" cy="100" rx="78" ry="66" fill="#f7931e" stroke="#6b3a1a" stroke-width="4"/>
+  <path d="M100 35 l-9 22 h18z M76 39 l-2 18 11-5z M124 39 l2 18 -11-5z" fill="#5a2d0c"/>
+  <path d="M23 92 l24 7 -22 9z M26 118 l22 0 -18 11z M177 92 l-24 7 22 9z M174 118 l-22 0 18 11z" fill="#5a2d0c"/>
+  <ellipse cx="100" cy="128" rx="40" ry="28" fill="#fff7ec"/>
+  <g class="eyes"><ellipse cx="73" cy="92" rx="10" ry="13" fill="#2b1a0e"/><circle cx="76" cy="87" r="4" fill="#fff"/>
+  <ellipse cx="127" cy="92" rx="10" ry="13" fill="#2b1a0e"/><circle cx="130" cy="87" r="4" fill="#fff"/></g>
+  <circle cx="56" cy="118" r="9" fill="#ff8fa3" opacity=".6"/><circle cx="144" cy="118" r="9" fill="#ff8fa3" opacity=".6"/>
+  <path d="M89 112 Q100 106 111 112 Q107 123 100 124 Q93 123 89 112Z" fill="#4a2511"/>
+  <path d="M100 124 v8 M84 134 Q100 150 116 134" fill="none" stroke="#4a2511" stroke-width="4" stroke-linecap="round"/>
+</svg>`;
+}
+function cheer(el) { if (!el) return; el.classList.remove('happy'); void el.offsetWidth; el.classList.add('happy'); }
+function confetti(n = 24) {
+  const em = ['⭐', '🎉', '✨', '🌟', '🎈'];
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('span');
+    s.className = 'conf'; s.textContent = rnd(em);
+    s.style.left = Math.random() * 100 + 'vw';
+    s.style.animationDuration = (1.6 + Math.random() * 1.6) + 's';
+    s.style.animationDelay = Math.random() * .5 + 's';
+    document.body.appendChild(s); setTimeout(() => s.remove(), 4000);
+  }
+}
+
+/* ================= Navegación ================= */
+function show(id) { $$('.screen').forEach(s => s.classList.toggle('active', s.id === id)); }
+function goHome() { stopGame(); show('home'); }
+$$('[data-home]').forEach(b => b.addEventListener('click', goHome));
+
+function refreshTexts() {
+  $('#homeTitle').textContent = `La Escuelita de ${settings.mascot || 'Tito'}`;
+  $('#homeHello').textContent = `¡Hola${childName() ? ', ' + childName() : ''}! ¿Jugamos?`;
+}
+
+$$('.mod').forEach(b => b.addEventListener('click', () => {
+  sfx.pop();
+  const mod = b.dataset.mod;
+  if (mod === 'hablemos') { openTalk(); return; }
+  G.mod = mod;
+  const m = MODS[mod];
+  $('#levelsTitle').textContent = m.title;
+  $('#levelBtns').innerHTML = LEVELS.map((L, i) =>
+    `<button class="lvl" data-level="${i + 1}" style="--c:${L.c}"><span class="stars">${L.stars}</span><span class="lvl-n">${L.n}</span><span class="lvl-sub">${m.counts[i]} ${m.unit} · ${L.opts} opciones</span></button>`).join('');
+  $$('#levelBtns .lvl').forEach(x => x.addEventListener('click', () => startGame(mod, +x.dataset.level)));
+  show('levels');
+  tts(m.title);
+}));
+
+/* ================= Motor de juego ================= */
+const G = { mod: null, level: 1, items: [], round: 0, total: 5, target: null, busy: false, used: [], wrong: 0, token: 0, hintT: 0, handAnim: null };
+
+function stopGame() {
+  G.token++; G.busy = false;
+  clearHint(); stopSpeech();
+  if (Mic.cancel) Mic.cancel();
+  $('#echo').classList.remove('show');
+}
+function startGame(mod, level) {
+  stopGame();
+  Object.assign(G, { mod, level, items: itemsFor(mod, level), round: 0, used: [] });
+  show('game');
+  nextRound();
+}
+function renderDots() { $('#dots').innerHTML = Array.from({ length: G.total }, (_, i) => `<div class="dot ${i < G.round ? 'on' : ''}"></div>`).join(''); }
+
+function targetHTML(it) {
+  if (it.type === 'emoji') return `<div class="target sil" id="target"><span class="emo">${it.show}</span></div>`;
+  if (it.type === 'letter') return `<div class="target letter" id="target"><span class="ltr">${it.show}</span><span class="hintpic">${it.pic}</span></div>`;
+  return `<div class="target bucket" id="target"><svg viewBox="0 0 200 200">
+    <path d="M30 70 Q100 -10 170 70" fill="none" stroke="#7a6a5a" stroke-width="7" stroke-linecap="round"/>
+    <path d="M22 72 L44 182 Q100 200 156 182 L178 72 Z" style="fill:${it.show}" stroke="#0003" stroke-width="5"/>
+    <ellipse cx="100" cy="72" rx="78" ry="20" fill="#0003"/>
+    <path d="M60 110 q8 40 4 60" stroke="#fff6" stroke-width="10" fill="none" stroke-linecap="round"/></svg></div>`;
+}
+function pieceHTML(it, i) {
+  if (it.type === 'emoji') return `<div class="piece" data-key="${esc(it.key)}"><span class="e">${it.show}</span></div>`;
+  if (it.type === 'color') return `<div class="piece color-piece" data-key="${esc(it.key)}" style="--c:${it.show}"><div class="ball"></div></div>`;
+  return `<div class="piece letter-piece" data-key="${esc(it.key)}" style="--c:${TILE_COLORS[i % TILE_COLORS.length]}">${it.show}</div>`;
+}
+
+async function nextRound() {
+  const tk = ++G.token;
+  clearHint(); renderDots();
+  if (G.round >= G.total) return showReward();
+  G.busy = false; G.wrong = 0;
+  let pool = G.items.filter(x => !G.used.includes(x.key));
+  if (!pool.length) { G.used = []; pool = G.items; }
+  const target = rnd(pool); G.target = target; G.used.push(target.key);
+  const nOpts = Math.min(LEVELS[G.level - 1].opts, G.items.length);
+  const opts = shuffle([target, ...shuffle(G.items.filter(x => x.key !== target.key)).slice(0, nOpts - 1)]);
+
+  $('#targetArea').innerHTML = targetHTML(target);
+  $('#tray').innerHTML = opts.map(pieceHTML).join('');
+  $('#target').addEventListener('click', () => { if (!G.busy) { resetHint(); tts(target.prompt); } });
+  $$('#tray .piece').forEach(enableDrag);
+
+  await wait(350); if (tk !== G.token) return;
+  await tts(target.prompt); if (tk !== G.token) return;
+  // en la primera ronda del nivel fácil mostramos la manito enseguida
+  scheduleHint(G.level === 1 && G.round === 0 ? 600 : 8000);
+}
+
+function itemByKey(k) { return G.items.find(x => x.key === k); }
+
+function enableDrag(el) {
+  let sx = 0, sy = 0, dragging = false, moved = false, pid = null;
+  el._dx = 0; el._dy = 0;
+  el.addEventListener('pointerdown', e => {
+    if (G.busy || dragging) return;
+    e.preventDefault();
+    pid = e.pointerId; try { el.setPointerCapture(pid); } catch (_) {}
+    sx = e.clientX; sy = e.clientY; dragging = true; moved = false;
+    el.classList.remove('wiggle', 'shake', 'tapped');
+    el.classList.add('dragging'); el.style.transition = 'none';
+    resetHint();
+  });
+  el.addEventListener('pointermove', e => {
+    if (!dragging || e.pointerId !== pid) return;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (Math.hypot(dx, dy) > 10) moved = true;
+    el._dx = dx; el._dy = dy;
+    el.style.transform = `translate(${dx}px,${dy}px) scale(1.12)`;
+    const t = $('#target'); if (t) t.classList.toggle('over', isOver(el, t));
+  });
+  const end = e => {
+    if (!dragging || e.pointerId !== pid) return;
+    dragging = false; el.classList.remove('dragging');
+    const t = $('#target'); if (t) t.classList.remove('over');
+    if (!moved) { el.style.transform = ''; return tapPiece(el); }
+    if (t && isOver(el, t)) drop(el); else goBack(el);
+  };
+  el.addEventListener('pointerup', end);
+  el.addEventListener('pointercancel', end);
+}
+function isOver(el, t) {
+  const a = el.getBoundingClientRect(), b = t.getBoundingClientRect(), pad = 40;
+  const cx = a.left + a.width / 2, cy = a.top + a.height / 2;
+  return cx > b.left - pad && cx < b.right + pad && cy > b.top - pad && cy < b.bottom + pad;
+}
+function goBack(el) {
+  el.style.transition = 'transform .4s cubic-bezier(.3,1.5,.6,1)';
+  el.style.transform = '';
+  el._dx = el._dy = 0;
+}
+function tapPiece(el) {
+  // tocar una pieza (sin arrastrar) dice su nombre: exploración libre
+  const it = itemByKey(el.dataset.key); if (!it) return;
+  el.classList.remove('tapped'); void el.offsetWidth; el.classList.add('tapped');
+  sfx.pop(); stopSpeech(); say(it.name);
+}
+function drop(el) {
+  const it = itemByKey(el.dataset.key);
+  if (it.key === G.target.key) return success(el, it);
+  // error suave: sin sonidos feos, sólo nombramos lo que eligió y volvemos a pedir
+  G.wrong++; bump(G.target.name, 'err');
+  goBack(el); setTimeout(() => el.classList.add('shake'), 380);
+  sfx.soft();
+  const tk = G.token;
+  stopSpeech();
+  (async () => {
+    await say(it.label); if (tk !== G.token || G.busy) return;
+    await tts(G.target.prompt); if (tk !== G.token || G.busy) return;
+    if (G.wrong >= 2) showHint();
+  })();
+}
+
+async function success(el, it) {
+  G.busy = true; clearHint(); stopSpeech();
+  const tk = G.token, t = $('#target');
+  const pr = el.getBoundingClientRect(), tr = t.getBoundingClientRect();
+  const cx = tr.left + tr.width / 2 - (pr.left + pr.width / 2);
+  const cy = tr.top + tr.height / 2 - (pr.top + pr.height / 2) + (it.type === 'color' ? -tr.height * .25 : 0);
+  el.style.transition = 'transform .3s ease-out, opacity .3s';
+  el.style.transform = `translate(${el._dx + cx}px,${el._dy + cy}px) scale(${it.type === 'color' ? .9 : 1.25})`;
+  await wait(300);
+  if (it.type !== 'color') el.style.opacity = '0';
+  t.classList.add('done');
+  sfx.ding(); confetti(14); cheer($('#gameMascot'));
+  bump(it.name, 'ok');
+  $$('#tray .piece').forEach(p => { if (p !== el) p.style.opacity = '.35'; });
+  await wait(250); if (tk !== G.token) return;
+  await sayAll(it.praise); if (tk !== G.token) return;
+  if (settings.echo) { await echoPhase(it); if (tk !== G.token) return; }
+  G.round++; renderDots();
+  await wait(500); if (tk !== G.token) return;
+  nextRound();
+}
+
+/* ---------- "¡Tu turno!": invitación a vocalizar ---------- */
+function echoWordHTML(w) {
+  const W = w.toUpperCase();
+  return `<span class="f">${esc(W.charAt(0))}</span>${esc(W.slice(1))}`;
+}
+async function echoPhase(it) {
+  const tk = G.token, ov = $('#echo'), wrap = $('#micWrap');
+  $('#echoVisual').innerHTML = it.type === 'color' ? `<div class="ball" style="--c:${it.show}"></div>`
+    : it.type === 'letter' ? (VOWELS.includes(it.key) ? `<span style="font-weight:800;color:#f7931e">${it.key}</span>` : it.echoPic)
+    : it.show;
+  $('#echoWord').innerHTML = echoWordHTML(it.echo);
+  wrap.classList.remove('heard', 'listening'); wrap.style.setProperty('--lvl', 0);
+  wrap.style.display = (settings.mic && Mic.ok) ? '' : 'none';
+  ov.classList.add('show');
+
+  await tts(rnd(['¡Ahora tú!', '¡Tu turno!', '¡Dilo conmigo!']), 'cheer'); if (tk !== G.token) return;
+  await say(it.echo); if (tk !== G.token) return;
+  await wait(250); if (tk !== G.token) return;
+
+  const result = await new Promise(res => {
+    let done = false;
+    const fin = v => { if (done) return; done = true; if (Mic.cancel) Mic.cancel(); $('#echoYes').onclick = $('#echoSkip').onclick = null; res(v); };
+    $('#echoYes').onclick = () => fin('yes');
+    $('#echoSkip').onclick = () => fin('skip');
+    if (settings.mic && Mic.ok) {
+      wrap.classList.add('listening');
+      Mic.listen(5000, l => wrap.style.setProperty('--lvl', l)).then(h => fin(h ? 'voice' : 'timeout'));
+    } else setTimeout(() => fin('timeout'), 7000);
+    const iv = setInterval(() => { if (tk !== G.token) { clearInterval(iv); fin('skip'); } else if (done) clearInterval(iv); }, 200);
+  });
+  wrap.classList.remove('listening');
+  if (tk !== G.token) return;
+
+  if (result === 'voice' || result === 'yes') {
+    wrap.classList.add('heard');
+    bump(it.name, 'voz');
+    sfx.yay(); confetti(30);
+    const n = childName();
+    await tts(rnd(['¡Yupiii! ¡Muy bien', '¡Wooow! ¡Qué bonita tu voz', '¡Bravo, bravo', '¡Lo hiciste súper', '¡Qué lindo sonó']) + (n ? ', ' + n : '') + '!', 'cheer');
+  } else if (result === 'timeout') {
+    // sin presión: lo modelamos una vez más y seguimos
+    await say(it.echo);
+  }
+  if (tk !== G.token) return;
+  await wait(300);
+  ov.classList.remove('show');
+}
+
+/* ---------- Pistas ---------- */
+function scheduleHint(ms) { clearTimeout(G.hintT); G.hintT = setTimeout(showHint, ms); }
+function resetHint() { clearHint(); if (!G.busy) scheduleHint(9000); }
+function clearHint() {
+  clearTimeout(G.hintT);
+  if (G.handAnim) { G.handAnim.cancel(); G.handAnim = null; }
+  $('#hand').style.display = 'none';
+}
+function showHint() {
+  if (G.busy || !G.target) return;
+  const p = $$('#tray .piece').find(x => x.dataset.key === G.target.key), t = $('#target');
+  if (!p || !t) return;
+  p.classList.remove('wiggle'); void p.offsetWidth; p.classList.add('wiggle');
+  const a = p.getBoundingClientRect(), b = t.getBoundingClientRect(), h = $('#hand');
+  const x1 = a.left + a.width / 2 - 22, y1 = a.top + a.height / 2 - 8, x2 = b.left + b.width / 2 - 22, y2 = b.top + b.height / 2 - 8;
+  h.style.display = 'block';
+  if (h.animate) {
+    G.handAnim = h.animate([
+      { transform: `translate(${x1}px,${y1}px) scale(1.1)`, opacity: 0 },
+      { transform: `translate(${x1}px,${y1}px) scale(.9)`, opacity: 1, offset: .15 },
+      { transform: `translate(${x2}px,${y2}px) scale(.9)`, opacity: 1, offset: .75 },
+      { transform: `translate(${x2}px,${y2}px) scale(1.1)`, opacity: 0 },
+    ], { duration: 1800, iterations: 2, easing: 'ease-in-out' });
+    G.handAnim.onfinish = () => { h.style.display = 'none'; G.handAnim = null; };
+  }
+  scheduleHint(12000);
+}
+
+/* ---------- Premio ---------- */
+async function showReward() {
+  const tk = G.token;
+  show('reward');
+  const n = childName();
+  $('#rewardText').textContent = `¡Lo lograste${n ? ', ' + n : ''}!`;
+  $('#rewardStars').innerHTML = Array.from({ length: G.total }, (_, i) => `<span style="animation-delay:${i * .18}s">⭐</span>`).join('');
+  sfx.yay(); confetti(45);
+  await tts(`¡Yupiii! ¡Lo lograste${n ? ', ' + n : ''}! ¡Ganaste ${G.total} estrellas!`, 'cheer');
+}
+$('#again').addEventListener('click', () => startGame(G.mod, G.level));
+
+/* ================= Hablemos (tablero de comunicación) ================= */
+const strip = [];
+function openTalk() {
+  stopGame();
+  $('#board').innerHTML = TALK.map(x => `<button class="card" data-w="${esc(x.w)}" style="--c:${x.c}"><span>${x.e}</span>${esc(x.w)}</button>`).join('');
+  $$('#board .card').forEach(c => c.addEventListener('click', () => {
+    const x = TALK.find(t => t.w === c.dataset.w);
+    c.classList.remove('tapped'); void c.offsetWidth; c.classList.add('tapped');
+    stopSpeech(); say(x.w);
+    if (strip.length >= 4) strip.shift();
+    strip.push(x); renderStrip();
+  }));
+  renderStrip(); show('talk'); tts('Hablemos');
+}
+function renderStrip() { $('#strip').innerHTML = strip.map(x => `<div class="chip"><span>${x.e}</span>${esc(x.w)}</div>`).join(''); }
+$('#stripPlay').addEventListener('click', async () => {
+  if (!strip.length) return;
+  stopSpeech(); await tts(strip.map(x => x.w).join(' '));
+});
+$('#stripClear').addEventListener('click', () => { strip.length = 0; renderStrip(); });
+
+/* ================= Área de padres ================= */
+(function gearHold() {
+  const g = $('#gear'); let t = 0;
+  const startH = e => { e.preventDefault(); g.classList.add('holding'); t = setTimeout(() => { g.classList.remove('holding'); openParents(); }, 2000); };
+  const stopH = () => { clearTimeout(t); g.classList.remove('holding'); };
+  g.addEventListener('pointerdown', startH);
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => g.addEventListener(ev, stopH));
+  g.addEventListener('contextmenu', e => e.preventDefault());
+})();
+
+const REC_GROUPS = {
+  'Animales': ANIMALS.flatMap(a => a.s ? [a.w, a.s] : [a.w]),
+  'Objetos': OBJECTS.map(o => o.w),
+  'Alimentos': FOODS.map(f => f.w),
+  'Colores': COLORS.map(c => c.w),
+  'Letras': LETTERS.flatMap(l => [l.l.toLowerCase(), l.w]),
+  'Hablemos': TALK.map(t => t.w),
+};
+let recGroup = 'Animales', recState = null;
+
+function openParents() { stopGame(); renderParents(); show('parents'); }
+function renderParents() {
+  const vOpts = ['<option value="">Automática (voz femenina)</option>', ...sortedVoices().map(v => `<option value="${esc(v.name)}" ${v.name === settings.voice ? 'selected' : ''}>${NATURAL.test(v.name) ? '⭐ ' : ''}${esc(v.name)} (${v.lang})</option>`)].join('');
+  const rows = Object.entries(stats).sort((a, b) => b[1].voz - a[1].voz || b[1].ok - a[1].ok)
+    .map(([w, s]) => `<tr><td>${esc(w)}</td><td>${s.ok}</td><td>${s.err}</td><td><b>${s.voz}</b></td></tr>`).join('');
+  $('#pscroll').innerHTML = `
+  <div class="pcard"><h3>👦 Perfil</h3>
+    <label>Nombre del niño (la app lo felicita por su nombre)<input id="pChild" value="${esc(settings.child)}" placeholder="Ej: Mateo"></label>
+    <label>Nombre de la mascota<input id="pMascot" value="${esc(settings.mascot)}"></label>
+  </div>
+  <div class="pcard"><h3>🗣️ Voz de la app</h3>
+    <label>Voz en español<select id="pVoice">${vOpts}</select></label>
+    <p>Estilo:
+      <button class="pbtn" data-style="1.6,0.95">🧒 Infantil</button>
+      <button class="pbtn" data-style="1.35,0.85">🌸 Dulce</button>
+      <button class="pbtn" data-style="1,0.9">🙂 Normal</button></p>
+    <label>Tono (más alto = más infantil): <span id="pPitchV">${settings.pitch}</span><input type="range" id="pPitch" min="0.8" max="2" step="0.05" value="${settings.pitch}"></label>
+    <label>Velocidad: <span id="pRateV">${settings.rate}</span><input type="range" id="pRate" min="0.6" max="1.1" step="0.05" value="${settings.rate}"></label>
+    <button class="pbtn" id="pTest">▶️ Probar voz</button>
+    <p class="small">La voz depende de las voces instaladas en el teléfono. Prueba varias de la lista con ▶️ y quédate con la que más le guste. Las marcadas con ⭐ son voces "naturales" (suenan mucho más humanas). En PC, ábrela con <b>Microsoft Edge</b> para tener voces naturales como "Dalia". En Android: Ajustes › Texto a voz › Google › Instalar datos de voz › Español, y elige una voz de alta calidad. Para la voz más cálida, graba tu voz (o la de un hermano o primo) más abajo.</p>
+    ${voices.length ? '' : '<p class="small">No encontré voces en español. En Android: Ajustes › Sistema › Idioma › Salida de texto a voz › instala "Español".</p>'}
+  </div>
+  <div class="pcard"><h3>🎤 "¡Tu turno!" y micrófono</h3>
+    <label class="chk"><input type="checkbox" id="pEcho" ${settings.echo ? 'checked' : ''}> Después de cada acierto, invitar a decir la palabra</label>
+    <label class="chk"><input type="checkbox" id="pMic" ${settings.mic ? 'checked' : ''}> Usar el micrófono para premiar automáticamente cualquier sonido que haga</label>
+    <label>Umbral del micrófono (izquierda = más sensible)<input type="range" id="pSens" min="0.008" max="0.12" step="0.002" value="${settings.sens}"></label>
+    <button class="pbtn" id="pMicTest">🎤 Probar micrófono (6 s)</button>
+    <div class="meter"><div id="pMeter"></div></div>
+    <p class="small">El micrófono no evalúa si la palabra es correcta: premia <b>cualquier intento vocal</b>. Si señala, hace un gesto o un sonido que el micrófono no captó, toca 👍.</p>
+  </div>
+  <div class="pcard"><h3>⏺️ Graba tu voz</h3>
+    <p class="small">Muchos niños responden mejor a la voz de mamá o papá. Graba cada palabra (máx. 3 s) y la app la usará en lugar de la voz robótica.</p>
+    <select id="pRecGroup">${Object.keys(REC_GROUPS).map(g => `<option ${g === recGroup ? 'selected' : ''}>${g}</option>`).join('')}</select>
+    <div id="pRecList"></div>
+  </div>
+  <div class="pcard"><h3>📊 Progreso</h3>
+    ${rows ? `<table><tr><th>Palabra</th><th>✅ Aciertos</th><th>↩️ Errores</th><th>🗣️ Vocalizó</th></tr>${rows}</table>` : '<p class="small">Aún no hay datos.</p>'}
+    <p><button class="pbtn" id="pReset">Borrar progreso</button></p>
+    <p class="small">Puedes mostrarle esta tabla a su fonoaudiólogo/a.</p>
+  </div>
+  <div class="pcard tips"><h3>💡 Cómo usarla</h3><ul>
+    <li>Sesiones cortas (5–10 min). Juega <b>con él</b>, sentado a su lado o frente a frente.</li>
+    <li>En "¡Tu turno!", di tú también la palabra, exagerando la boca, y <b>espera</b> unos segundos.</li>
+    <li>Celebra cualquier sonido o aproximación ("pe" por "perro" ¡cuenta!).</li>
+    <li>Empieza en <b>Fácil</b>. En Animales-Fácil se imitan sonidos ("muuu", "guau"), que suelen salir antes que las palabras.</li>
+    <li>Si toca una pieza sin arrastrarla, la app dice su nombre: déjalo explorar.</li>
+    <li>"Hablemos" es un tablero de comunicación: úsalo tú también al hablarle ("quiero" + "agua").</li>
+    <li>Para entrar aquí: mantén presionado ⚙️ dos segundos.</li>
+  </ul></div>`;
+
+  $('#pChild').oninput = e => { settings.child = e.target.value; saveSettings(); refreshTexts(); };
+  $('#pMascot').oninput = e => { settings.mascot = e.target.value; saveSettings(); refreshTexts(); };
+  $('#pVoice').onchange = e => { settings.voice = e.target.value; saveSettings(); stopSpeech(); tts(`¡Hola! Soy ${settings.mascot}.`); };
+  $('#pPitch').oninput = e => { settings.pitch = +e.target.value; $('#pPitchV').textContent = settings.pitch; saveSettings(); };
+  $$('[data-style]').forEach(b => b.onclick = () => {
+    const [p, r] = b.dataset.style.split(',').map(Number);
+    settings.pitch = p; settings.rate = r; saveSettings();
+    $('#pPitch').value = p; $('#pPitchV').textContent = p; $('#pRate').value = r; $('#pRateV').textContent = r;
+    stopSpeech(); tts(`¡Hola! Soy ${settings.mascot}. ¿Jugamos?`);
+  });
+  $('#pRate').oninput = e => { settings.rate = +e.target.value; $('#pRateV').textContent = settings.rate; saveSettings(); };
+  $('#pTest').onclick = () => { stopSpeech(); tts(`¡Hola${childName() ? ' ' + childName() : ''}! Soy ${settings.mascot}. ¿Dónde está el perro?`); };
+  $('#pEcho').onchange = e => { settings.echo = e.target.checked; saveSettings(); };
+  $('#pMic').onchange = async e => { settings.mic = e.target.checked; saveSettings(); if (settings.mic) await Mic.init(); };
+  $('#pSens').oninput = e => { settings.sens = +e.target.value; saveSettings(); };
+  $('#pMicTest').onclick = async () => {
+    if (!(await Mic.init())) return alert('No se pudo acceder al micrófono. Revisa los permisos del navegador.');
+    const t0 = performance.now(), m = $('#pMeter');
+    const loop = () => {
+      if (!m.isConnected) return;
+      const l = Mic.level(), over = l > settings.sens;
+      m.style.width = Math.min(100, l / (settings.sens * 3) * 100) + '%';
+      m.style.background = over ? '#43a047' : '#bbb';
+      if (performance.now() - t0 < 6000) requestAnimationFrame(loop); else m.style.width = '0';
+    };
+    loop();
+  };
+  $('#pRecGroup').onchange = e => { recGroup = e.target.value; renderRecList(); };
+  $('#pReset').onclick = () => { if (confirm('¿Borrar todo el progreso?')) { stats = {}; store.set('stats', stats); renderParents(); } };
+  renderRecList();
+}
+function renderRecList() {
+  const words = [...new Set(REC_GROUPS[recGroup])];
+  $('#pRecList').innerHTML = words.map(w => {
+    const has = REC.has(norm(w));
+    return `<div class="rec-row" data-w="${esc(w)}"><b>${esc(w)} ${has ? '<span class="ok-dot">●</span>' : ''}</b>
+      <button class="pbtn" data-act="rec">⏺️</button>
+      <button class="pbtn" data-act="play">▶️</button>
+      <button class="pbtn" data-act="del" ${has ? '' : 'disabled'}>🗑️</button></div>`;
+  }).join('');
+  $$('#pRecList .rec-row').forEach(row => {
+    const w = row.dataset.w;
+    row.querySelector('[data-act=rec]').onclick = e => toggleRecord(w, e.currentTarget);
+    row.querySelector('[data-act=play]').onclick = () => { stopSpeech(); say(w); };
+    row.querySelector('[data-act=del]').onclick = async () => { REC.delete(norm(w)); await DB.del(norm(w)); renderRecList(); };
+  });
+}
+async function toggleRecord(word, btn) {
+  if (recState) { recState.stop(); return; }
+  if (!window.MediaRecorder) return alert('Este navegador no permite grabar audio.');
+  if (!(await Mic.init())) return alert('No se pudo acceder al micrófono. Revisa los permisos del navegador.');
+  stopSpeech();
+  const mr = new MediaRecorder(Mic.stream), chunks = [];
+  let timer = 0;
+  mr.ondataavailable = e => e.data.size && chunks.push(e.data);
+  mr.onstop = async () => {
+    clearTimeout(timer); recState = null;
+    const blob = new Blob(chunks, { type: mr.mimeType || 'audio/webm' });
+    if (blob.size > 0) { REC.set(norm(word), blob); await DB.put(norm(word), blob); }
+    renderRecList();
+  };
+  recState = { stop: () => { if (mr.state !== 'inactive') mr.stop(); } };
+  btn.classList.add('rec-on'); btn.textContent = '⏹️';
+  mr.start();
+  timer = setTimeout(() => recState && recState.stop(), 3000);
+}
+
+/* ================= Arranque ================= */
+$$('[data-mascot]').forEach(m => m.innerHTML = mascotSVG());
+refreshTexts();
+DB.open().then(() => DB.all()).then(m => m.forEach((v, k) => REC.set(k, v)));
+
+$('#startBtn').addEventListener('click', async () => {
+  const ac = audioCtx(); if (ac && ac.state === 'suspended') ac.resume();
+  try { if (document.documentElement.requestFullscreen && matchMedia('(pointer:coarse)').matches) await document.documentElement.requestFullscreen(); } catch (e) {}
+  $('#start').classList.remove('show');
+  show('home');
+  if (settings.mic) await Mic.init();
+  loadVoices();
+  const n = childName();
+  tts(`¡Holaaa${n ? ' ' + n : ''}! Soy ${settings.mascot}, tu amigo tigrito. ¡Vamos a jugar!`, 'cheer');
+});
+
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
